@@ -1,6 +1,8 @@
 SELECT c.CustomerId,
        c.FirstName,
        c.LastName,
+       --c.FirstName + ' ' +  c.LastName AS CustomerName,
+       CONCAT(c.FirstName, + ' ' +  c.LastName) AS CustomerName,
        c.City,
        c.Company
 FROM   Customer AS c
@@ -20,7 +22,37 @@ ORDER BY NumberofCustomers DESC
 
 SELECT 
        i.CustomerId,
-       SUM (i.Total) AS invoicetotal
-FROM   Invoice AS i
-GROUP BY i.CustomerId
+       c.FirstName, 
+       c.lastname,
+       CONCAT(c.FirstName, ' ', c.lastname) AS CustomerName,
+       SUM (i.Total) AS invoicetotal,
+       COUNT(*) AS NumberofInvoices
+FROM   Invoice AS i JOIN Customer AS c ON I.CustomerId = c.CustomerId
+GROUP BY i.CustomerId, c.FirstName, c.LastName,  CONCAT(c.FirstName, ' ', c.lastname)
 ORDER BY i.CustomerId;
+
+--alternative way
+
+SELECT 
+     ibc.CustomerId,
+     c.FirstName,
+     c.LastName,
+     CONCAT(c.FirstName, ' ', c.lastname) AS CustomerName,
+     ibc.invoicetotal,
+     ibc.NumberOfInvoices
+ FROM (
+SELECT
+    i.CustomerId,
+    SUM(i.Total) As InvoiceTotal,
+    COUNT(*) AS NumberOfInvoices
+FROM   Invoice AS i
+group by i.CustomerId) AS ibc JOIN Customer C ON ibc.CustomerId = c.CustomerId
+
+--Customer and Employee
+SELECT e.EmployeeId, e.FirstName, e.LastName, 
+     CONCAT (e.FirstName, ' ', e.lastname) AS EmployeeName,
+     CONCAT (c.FirstName, ' ', c.lastname) AS CustomerName
+from Employee AS e JOIN Customer AS c ON e.EmployeeId = c.SupportRepId
+
+
+ 
